@@ -1,27 +1,17 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import { AdminNav } from "@/components/admin-nav";
 import { ProductForm } from "@/components/product-form";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-
-interface Product {
-	id: string;
-	name: string;
-	description: string;
-	price: number;
-	image: string;
-	ingredients: string;
-}
+import { getProductById, updateProduct } from "@/lib/firestore";
 
 export default function EditProductPage() {
 	const { isLoggedIn } = useAuth();
 	const router = useRouter();
 	const params = useParams();
-	const [product, setProduct] = useState<Product | null>(null);
+	const [product, setProduct] = useState<any>(null);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
@@ -32,23 +22,28 @@ export default function EditProductPage() {
 
 	useEffect(() => {
 		const loadProduct = async () => {
-			const res = await fetch("/api/products");
-			const products = await res.json();
-			const found = products.find((p: Product) => p.id === params.id);
-			setProduct(found || null);
+			getProductById(`${params.id}`).then(setProduct);
 			setLoading(false);
 		};
 		loadProduct();
 	}, [params.id]);
 
 	const handleSubmit = async (data: any) => {
-		const products = JSON.parse(localStorage.getItem("products") || "[]");
-		const index = products.findIndex((p: Product) => p.id === params.id);
-		if (index !== -1) {
-			products[index] = { ...data, id: params.id };
-			localStorage.setItem("products", JSON.stringify(products));
+		try {
+			await updateProduct(`${params.id}`, {
+				name: data.name,
+				brand: data.brand,
+				description: data.description,
+				price: parseFloat(data.price),
+				image: data.image,
+				ingredients: data.ingredients,
+			});
+
+			router.push("/admin/products");
+		} catch (error) {
+			console.error("Error updating product:", error);
+			alert("Failed to update product. Please try again.");
 		}
-		router.push("/admin/products");
 	};
 
 	if (!isLoggedIn) return null;

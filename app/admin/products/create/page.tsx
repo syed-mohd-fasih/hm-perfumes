@@ -1,12 +1,11 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import { AdminNav } from "@/components/admin-nav";
 import { ProductForm } from "@/components/product-form";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { addProduct } from "@/lib/firestore";
 
 export default function CreateProductPage() {
 	const { isLoggedIn } = useAuth();
@@ -19,14 +18,21 @@ export default function CreateProductPage() {
 	}, [isLoggedIn, router]);
 
 	const handleSubmit = async (data: any) => {
-		const products = JSON.parse(localStorage.getItem("products") || "[]");
-		const newProduct = {
-			...data,
-			id: Date.now().toString(),
-		};
-		products.push(newProduct);
-		localStorage.setItem("products", JSON.stringify(products));
-		router.push("/admin/products");
+		try {
+			await addProduct({
+				name: data.name,
+				brand: data.brand,
+				description: data.description,
+				price: parseFloat(data.price),
+				image: data.image,
+				ingredients: data.ingredients,
+			});
+
+			router.push("/admin/products");
+		} catch (error) {
+			console.error("Error adding product:", error);
+			alert("Failed to add product. Please try again.");
+		}
 	};
 
 	if (!isLoggedIn) return null;

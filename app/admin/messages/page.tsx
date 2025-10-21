@@ -1,26 +1,16 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import { AdminNav } from "@/components/admin-nav";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Trash2, Check } from "lucide-react";
-
-interface Message {
-	id: string;
-	name: string;
-	email: string;
-	message: string;
-	timestamp: string;
-	read: boolean;
-}
+import { getAllMessages, markMessageRead, deleteMessage } from "@/lib/firestore";
 
 export default function AdminMessagesPage() {
 	const { isLoggedIn } = useAuth();
 	const router = useRouter();
-	const [messages, setMessages] = useState<Message[]>([]);
+	const [messages, setMessages] = useState<any[]>([]);
 
 	useEffect(() => {
 		if (!isLoggedIn) {
@@ -28,24 +18,39 @@ export default function AdminMessagesPage() {
 		}
 	}, [isLoggedIn, router]);
 
+	// Load messages from Firestore
 	useEffect(() => {
-		const loadMessages = () => {
-			const stored = JSON.parse(localStorage.getItem("messages") || "[]");
-			setMessages(stored);
-		};
+		async function loadMessages() {
+			try {
+				const data = await getAllMessages();
+				setMessages(data);
+			} catch (error) {
+				console.error("Error loading messages:", error);
+			}
+		}
+
 		loadMessages();
 	}, []);
 
-	const handleMarkAsRead = (id: string) => {
-		const updated = messages.map((m) => (m.id === id ? { ...m, read: !m.read } : m));
-		setMessages(updated);
-		localStorage.setItem("messages", JSON.stringify(updated));
+	// Toggle read/unread in Firestore
+	const handleMarkAsRead = async (id: string) => {
+		try {
+			await markMessageRead(id);
+			// Update locally after successful Firestore update
+			setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, read: true } : m)));
+		} catch (error) {
+			console.error("Error marking message as read:", error);
+		}
 	};
 
-	const handleDelete = (id: string) => {
-		const updated = messages.filter((m) => m.id !== id);
-		setMessages(updated);
-		localStorage.setItem("messages", JSON.stringify(updated));
+	// Delete message in Firestore
+	const handleDelete = async (id: string) => {
+		try {
+			await deleteMessage(id);
+			setMessages((prev) => prev.filter((m) => m.id !== id));
+		} catch (error) {
+			console.error("Error deleting message:", error);
+		}
 	};
 
 	if (!isLoggedIn) return null;

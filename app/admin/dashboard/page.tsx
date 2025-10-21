@@ -1,12 +1,11 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import { AdminNav } from "@/components/admin-nav";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { getAllMessages, getAllProducts } from "@/lib/firestore";
 
 export default function AdminDashboardPage() {
 	const { isLoggedIn } = useAuth();
@@ -21,10 +20,15 @@ export default function AdminDashboardPage() {
 
 	useEffect(() => {
 		const loadStats = async () => {
-			const productsRes = await fetch("/api/products");
-			const products = await productsRes.json();
-			const messages = JSON.parse(localStorage.getItem("messages") || "[]");
-			setStats({ products: products.length, messages: messages.length });
+			try {
+				const [products, messages] = await Promise.all([getAllProducts(), getAllMessages()]);
+				setStats({
+					products: products.length,
+					messages: messages.length,
+				});
+			} catch (error) {
+				console.error("Error loading stats:", error);
+			}
 		};
 		loadStats();
 	}, []);

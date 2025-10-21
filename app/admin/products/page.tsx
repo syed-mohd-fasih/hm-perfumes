@@ -1,24 +1,17 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import { AdminNav } from "@/components/admin-nav";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Trash2, Edit2 } from "lucide-react";
-
-interface Product {
-	id: string;
-	name: string;
-	price: number;
-}
+import { getAllProducts, deleteProduct } from "@/lib/firestore";
 
 export default function AdminProductsPage() {
 	const { isLoggedIn } = useAuth();
 	const router = useRouter();
-	const [products, setProducts] = useState<Product[]>([]);
+	const [products, setProducts] = useState<any[]>([]);
 
 	useEffect(() => {
 		if (!isLoggedIn) {
@@ -28,18 +21,20 @@ export default function AdminProductsPage() {
 
 	useEffect(() => {
 		const loadProducts = async () => {
-			const res = await fetch("/api/products");
-			const data = await res.json();
-			setProducts(data);
+			getAllProducts().then(setProducts);
 		};
 		loadProducts();
 	}, []);
 
-	const handleDelete = (id: string) => {
-		if (confirm("Are you sure you want to delete this product?")) {
-			const updatedProducts = products.filter((p) => p.id !== id);
-			localStorage.setItem("products", JSON.stringify(updatedProducts));
-			setProducts(updatedProducts);
+	const handleDelete = async (id: string) => {
+		const confirmDelete = confirm("Are you sure you want to delete this product?");
+		if (!confirmDelete) return;
+
+		try {
+			await deleteProduct(id);
+			setProducts((prev) => prev.filter((p) => p.id !== id));
+		} catch (error) {
+			console.error("Error deleting product:", error);
 		}
 	};
 
