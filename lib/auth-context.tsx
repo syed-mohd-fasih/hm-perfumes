@@ -1,52 +1,43 @@
-"use client"
+"use client";
 
-import type React from "react"
+import { createContext, useContext, useEffect, useState } from "react";
+import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { auth } from "./firebase";
 
-import { createContext, useContext, useState, useEffect } from "react"
+type AuthContextType = {
+	user: any;
+	loading: boolean;
+	login: (email: string, password: string) => Promise<void>;
+	logout: () => Promise<void>;
+};
 
-interface AuthContextType {
-  isLoggedIn: boolean
-  login: (email: string, password: string) => boolean
-  logout: () => void
-}
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+	const [user, setUser] = useState<any>(null);
+	const [loading, setLoading] = useState(true);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [isLoaded, setIsLoaded] = useState(false)
+	useEffect(() => {
+		const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+			setUser(firebaseUser);
+			setLoading(false);
+		});
+		return () => unsubscribe();
+	}, []);
 
-  useEffect(() => {
-    const stored = localStorage.getItem("admin_logged_in")
-    if (stored === "true") {
-      setIsLoggedIn(true)
-    }
-    setIsLoaded(true)
-  }, [])
+	const login = async (email: string, password: string) => {
+		await signInWithEmailAndPassword(auth, email, password);
+	};
 
-  const login = (email: string, password: string) => {
-    if (email === "admin@example.com" && password === "password123") {
-      setIsLoggedIn(true)
-      localStorage.setItem("admin_logged_in", "true")
-      return true
-    }
-    return false
-  }
+	const logout = async () => {
+		await signOut(auth);
+	};
 
-  const logout = () => {
-    setIsLoggedIn(false)
-    localStorage.removeItem("admin_logged_in")
-  }
+	return <AuthContext.Provider value={{ user, loading, login, logout }}>{children}</AuthContext.Provider>;
+};
 
-  if (!isLoaded) return <>{children}</>
-
-  return <AuthContext.Provider value={{ isLoggedIn, login, logout }}>{children}</AuthContext.Provider>
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext)
-  if (!context) {
-    throw new Error("useAuth must be used within AuthProvider")
-  }
-  return context
-}
+export const useAuth = () => {
+	const ctx = useContext(AuthContext);
+	if (!ctx) throw new Error("useAuth must be used within AuthProvider");
+	return ctx;
+};

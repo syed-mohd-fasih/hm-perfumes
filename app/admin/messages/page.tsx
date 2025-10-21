@@ -8,15 +8,15 @@ import { Trash2, Check } from "lucide-react";
 import { getAllMessages, markMessageRead, deleteMessage } from "@/lib/firestore";
 
 export default function AdminMessagesPage() {
-	const { isLoggedIn } = useAuth();
+	const { user, loading } = useAuth();
 	const router = useRouter();
 	const [messages, setMessages] = useState<any[]>([]);
 
 	useEffect(() => {
-		if (!isLoggedIn) {
+		if (!loading && (!user || user.email !== "hmperfumes@gmail.com")) {
 			router.push("/admin/login");
 		}
-	}, [isLoggedIn, router]);
+	}, [user, loading, router]);
 
 	// Load messages from Firestore
 	useEffect(() => {
@@ -53,7 +53,8 @@ export default function AdminMessagesPage() {
 		}
 	};
 
-	if (!isLoggedIn) return null;
+	if (loading) return <p>Loading...</p>;
+	if (!user) return null;
 
 	return (
 		<main className="min-h-screen flex flex-col">

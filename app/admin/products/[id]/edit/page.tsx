@@ -8,17 +8,17 @@ import { useEffect, useState } from "react";
 import { getProductById, updateProduct } from "@/lib/firestore";
 
 export default function EditProductPage() {
-	const { isLoggedIn } = useAuth();
+	const { user, loading } = useAuth();
 	const router = useRouter();
 	const params = useParams();
 	const [product, setProduct] = useState<any>(null);
-	const [loading, setLoading] = useState(true);
+	const [_loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		if (!isLoggedIn) {
+		if (!loading && (!user || user.email !== "hmperfumes@gmail.com")) {
 			router.push("/admin/login");
 		}
-	}, [isLoggedIn, router]);
+	}, [user, loading, router]);
 
 	useEffect(() => {
 		const loadProduct = async () => {
@@ -46,9 +46,9 @@ export default function EditProductPage() {
 		}
 	};
 
-	if (!isLoggedIn) return null;
+	if (!user) return null;
 
-	if (loading) {
+	if (_loading) {
 		return (
 			<main className="min-h-screen flex flex-col">
 				<AdminNav />

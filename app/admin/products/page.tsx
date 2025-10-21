@@ -9,15 +9,15 @@ import { Trash2, Edit2 } from "lucide-react";
 import { getAllProducts, deleteProduct } from "@/lib/firestore";
 
 export default function AdminProductsPage() {
-	const { isLoggedIn } = useAuth();
+	const { user, loading } = useAuth();
 	const router = useRouter();
 	const [products, setProducts] = useState<any[]>([]);
 
 	useEffect(() => {
-		if (!isLoggedIn) {
+		if (!loading && (!user || user.email !== "hmperfumes@gmail.com")) {
 			router.push("/admin/login");
 		}
-	}, [isLoggedIn, router]);
+	}, [user, loading, router]);
 
 	useEffect(() => {
 		const loadProducts = async () => {
@@ -38,7 +38,8 @@ export default function AdminProductsPage() {
 		}
 	};
 
-	if (!isLoggedIn) return null;
+	if (loading) return <p>Loading...</p>;
+	if (!user) return null;
 
 	return (
 		<main className="min-h-screen flex flex-col">

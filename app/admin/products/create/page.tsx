@@ -8,14 +8,14 @@ import { useEffect } from "react";
 import { addProduct } from "@/lib/firestore";
 
 export default function CreateProductPage() {
-	const { isLoggedIn } = useAuth();
+	const { user, loading } = useAuth();
 	const router = useRouter();
 
 	useEffect(() => {
-		if (!isLoggedIn) {
+		if (!loading && (!user || user.email !== "hmperfumes@gmail.com")) {
 			router.push("/admin/login");
 		}
-	}, [isLoggedIn, router]);
+	}, [user, loading, router]);
 
 	const handleSubmit = async (data: any) => {
 		try {
@@ -35,7 +35,8 @@ export default function CreateProductPage() {
 		}
 	};
 
-	if (!isLoggedIn) return null;
+	if (loading) return <p>Loading...</p>;
+	if (!user) return null;
 
 	return (
 		<main className="min-h-screen flex flex-col">

@@ -8,15 +8,15 @@ import Link from "next/link";
 import { getAllMessages, getAllProducts } from "@/lib/firestore";
 
 export default function AdminDashboardPage() {
-	const { isLoggedIn } = useAuth();
+	const { user, loading } = useAuth();
 	const router = useRouter();
 	const [stats, setStats] = useState({ products: 0, messages: 0 });
 
 	useEffect(() => {
-		if (!isLoggedIn) {
+		if (!loading && (!user || user.email !== "hmperfumes@gmail.com")) {
 			router.push("/admin/login");
 		}
-	}, [isLoggedIn, router]);
+	}, [user, loading, router]);
 
 	useEffect(() => {
 		const loadStats = async () => {
@@ -33,7 +33,8 @@ export default function AdminDashboardPage() {
 		loadStats();
 	}, []);
 
-	if (!isLoggedIn) return null;
+	if (loading) return <p>Loading...</p>;
+	if (!user) return null;
 
 	return (
 		<main className="min-h-screen flex flex-col">

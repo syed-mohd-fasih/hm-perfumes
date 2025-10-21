@@ -18,14 +18,15 @@ export default function AdminLoginPage() {
 		e.preventDefault();
 		setError("");
 		setLoading(true);
-
-		if (login(email, password)) {
+		try {
+			await login(email, password);
 			router.push("/admin/dashboard");
-		} else {
+		} catch (err: any) {
 			setError("Invalid email or password");
+			console.log(err);
+		} finally {
+			setLoading(false);
 		}
-
-		setLoading(false);
 	};
 
 	return (
@@ -83,12 +84,6 @@ export default function AdminLoginPage() {
 					>
 						{loading ? "Signing in..." : "Sign In"}
 					</button>
-
-					<div className="text-center text-sm text-foreground/60">
-						<p>Demo credentials:</p>
-						<p>Email: admin@example.com</p>
-						<p>Password: password123</p>
-					</div>
 				</form>
 
 				<div className="text-center mt-6">
