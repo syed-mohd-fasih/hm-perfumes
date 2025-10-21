@@ -1,0 +1,38 @@
+[
+  {
+    "id": "1",
+    "name": "Amber Essence",
+    "brand": "HM Perfumes",
+    "description": "A warm, rich blend of amber and vanilla.",
+    "price": 59.99,
+    "image": "/placeholder.svg?height=400&width=300",
+    "ingredients": "Amber, Vanilla, Musk"
+  },
+  {
+    "id": "2",
+    "name": "Citrus Bloom",
+    "brand": "HM Perfumes",
+    "description": "Fresh citrus with soft floral notes.",
+    "price": 49.99,
+    "image": "/placeholder.svg?height=400&width=300",
+    "ingredients": "Orange, Jasmine, Bergamot"
+  },
+  {
+    "id": "3",
+    "name": "Midnight Musk",
+    "brand": "HM Perfumes",
+    "description": "Deep and sensual musk with woody undertones.",
+    "price": 64.99,
+    "image": "/placeholder.svg?height=400&width=300",
+    "ingredients": "Musk, Sandalwood, Oud"
+  },
+  {
+    "id": "4",
+    "name": "Rose Garden",
+    "brand": "HM Perfumes",
+    "description": "Elegant rose with hints of peony and lily.",
+    "price": 54.99,
+    "image": "/placeholder.svg?height=400&width=300",
+    "ingredients": "Rose, Peony, Lily, Musk"
+  }
+]
