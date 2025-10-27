@@ -5,6 +5,7 @@ import { signInWithPopup, signOut } from "firebase/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser, setLoading } from "@/store/features/authSlice";
 import { RootState } from "@/store/store";
+import { LucideLogOut } from "lucide-react";
 
 export default function GoogleLoginButton() {
 	const dispatch = useDispatch();
@@ -40,8 +41,8 @@ export default function GoogleLoginButton() {
 		<div className="flex items-center gap-3">
 			<img src={user.photoURL || ""} alt="user" className="w-8 h-8 rounded-full" />
 			<span>{user.displayName}</span>
-			<button onClick={handleLogout} className="text-sm underline">
-				Logout
+			<button onClick={handleLogout} className="p-2 rounded-full hover:bg-white/10 dark:hover:bg-white/5">
+				<LucideLogOut className="w-5 h-5" />
 			</button>
 		</div>
 	) : (

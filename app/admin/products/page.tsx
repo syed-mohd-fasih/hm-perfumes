@@ -1,23 +1,18 @@
 "use client";
 
 import { AdminNav } from "@/components/admin-nav";
-import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Trash2, Edit2 } from "lucide-react";
 import { getAllProducts, deleteProduct } from "@/lib/firestore";
+import { RootState } from "@/store/store";
+import { useSelector } from "react-redux";
 
 export default function AdminProductsPage() {
-	const { user, loading } = useAuth();
 	const router = useRouter();
+	const { user, isAdmin } = useSelector((state: RootState) => state.auth);
 	const [products, setProducts] = useState<any[]>([]);
-
-	useEffect(() => {
-		if (!loading && !user) {
-			router.push("/admin/login");
-		}
-	}, [user, loading, router]);
 
 	useEffect(() => {
 		const loadProducts = async () => {
@@ -30,16 +25,15 @@ export default function AdminProductsPage() {
 		const confirmDelete = confirm("Are you sure you want to delete this product?");
 		if (!confirmDelete) return;
 
-		try {
-			await deleteProduct(id);
-			setProducts((prev) => prev.filter((p) => p.id !== id));
-		} catch (error) {
-			console.error("Error deleting product:", error);
+		if (user && isAdmin) {
+			try {
+				await deleteProduct(id);
+				setProducts((prev) => prev.filter((p) => p.id !== id));
+			} catch (error) {
+				console.error("Error deleting product:", error);
+			}
 		}
 	};
-
-	if (loading) return <p>Loading...</p>;
-	if (!user) return null;
 
 	return (
 		<main className="min-h-screen flex flex-col">

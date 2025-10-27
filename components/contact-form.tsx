@@ -33,8 +33,6 @@ export function ContactForm() {
 				message: formData.message,
 			});
 
-			console.log("Contact form submitted:", formData);
-
 			// Reset form and show success
 			setSubmitted(true);
 			setFormData({ name: "", email: "", message: "" });
@@ -48,7 +46,7 @@ export function ContactForm() {
 	return (
 		<form onSubmit={handleSubmit} className="space-y-6 max-w-2xl mx-auto">
 			{submitted && (
-				<div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-3xl shadow-lg p-4 bg-primary/10 border-primary/30 text-primary animate-in fade-in">
+				<div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-3xl shadow-lg p-4 text-primary animate-in fade-in">
 					Thank you for your message! We'll get back to you soon.
 				</div>
 			)}
@@ -61,7 +59,7 @@ export function ContactForm() {
 					value={formData.name}
 					onChange={handleChange}
 					required
-					className="w-full px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+					className="w-full px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary"
 					placeholder="Your name"
 				/>
 			</div>
@@ -74,7 +72,7 @@ export function ContactForm() {
 					value={formData.email}
 					onChange={handleChange}
 					required
-					className="w-full px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+					className="w-full px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary"
 					placeholder="your@email.com"
 				/>
 			</div>
@@ -87,7 +85,7 @@ export function ContactForm() {
 					onChange={handleChange}
 					required
 					rows={6}
-					className="w-full px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+					className="w-full px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary resize-none"
 					placeholder="Your message..."
 				/>
 			</div>

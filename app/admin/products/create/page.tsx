@@ -2,41 +2,34 @@
 
 import { AdminNav } from "@/components/admin-nav";
 import { ProductForm } from "@/components/product-form";
-import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { addProduct } from "@/lib/firestore";
+import { RootState } from "@/store/store";
+import { useSelector } from "react-redux";
 
 export default function CreateProductPage() {
-	const { user, loading } = useAuth();
+	const { user, isAdmin } = useSelector((state: RootState) => state.auth);
 	const router = useRouter();
 
-	useEffect(() => {
-		if (!loading && !user) {
-			router.push("/admin/login");
-		}
-	}, [user, loading, router]);
-
 	const handleSubmit = async (data: any) => {
-		try {
-			await addProduct({
-				name: data.name,
-				brand: data.brand,
-				description: data.description,
-				price: parseFloat(data.price),
-				image: data.image,
-				ingredients: data.ingredients,
-			});
+		if (user && isAdmin) {
+			try {
+				await addProduct({
+					name: data.name,
+					brand: data.brand,
+					description: data.description,
+					price: parseFloat(data.price),
+					image: data.image,
+					ingredients: data.ingredients,
+				});
 
-			router.push("/admin/products");
-		} catch (error) {
-			console.error("Error adding product:", error);
-			alert("Failed to add product. Please try again.");
+				router.push("/admin/products");
+			} catch (error) {
+				console.error("Error adding product:", error);
+				alert("Failed to add product. Please try again.");
+			}
 		}
 	};
-
-	if (loading) return <p>Loading...</p>;
-	if (!user) return null;
 
 	return (
 		<main className="min-h-screen flex flex-col">

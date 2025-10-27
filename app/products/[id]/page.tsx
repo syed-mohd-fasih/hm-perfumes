@@ -92,7 +92,9 @@ export default function ProductDetailPage() {
 							</div>
 
 							<div className="flex items-baseline gap-2">
-								<span className="text-4xl font-bold text-secondary">${product.price.toFixed(2)}</span>
+								<span className="text-4xl font-bold text-secondary">
+									PKR {product.price.toFixed(2)}
+								</span>
 							</div>
 
 							<Link

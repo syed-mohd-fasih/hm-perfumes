@@ -10,11 +10,13 @@ interface User {
 interface AuthState {
 	user: User | null;
 	loading: boolean;
+	isAdmin: boolean;
 }
 
 const initialState: AuthState = {
 	user: null,
 	loading: false,
+	isAdmin: false,
 };
 
 const authSlice = createSlice({
@@ -28,8 +30,11 @@ const authSlice = createSlice({
 		setLoading: (state, action: PayloadAction<boolean>) => {
 			state.loading = action.payload;
 		},
+		setAdmin: (state, action: PayloadAction<boolean>) => {
+			state.isAdmin = action.payload;
+		},
 	},
 });
 
-export const { setUser, setLoading } = authSlice.actions;
+export const { setUser, setLoading, setAdmin } = authSlice.actions;
 export default authSlice.reducer;

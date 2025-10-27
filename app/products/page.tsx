@@ -60,7 +60,7 @@ export default function ProductsPage() {
 									</div>
 									<h3 className="font-semibold text-lg mb-1">{product.name}</h3>
 									<p className="text-sm text-foreground/60 mb-3 flex-1">{product.description}</p>
-									<p className="text-secondary font-bold text-lg">${product.price.toFixed(2)}</p>
+									<p className="text-secondary font-bold text-lg">PKR {product.price.toFixed(2)}</p>
 								</div>
 							</Link>
 						))}

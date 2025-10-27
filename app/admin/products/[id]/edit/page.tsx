@@ -2,23 +2,18 @@
 
 import { AdminNav } from "@/components/admin-nav";
 import { ProductForm } from "@/components/product-form";
-import { useAuth } from "@/lib/auth-context";
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getProductById, updateProduct } from "@/lib/firestore";
+import { RootState } from "@/store/store";
+import { useSelector } from "react-redux";
 
 export default function EditProductPage() {
-	const { user, loading } = useAuth();
+	const { user, isAdmin } = useSelector((state: RootState) => state.auth);
 	const router = useRouter();
 	const params = useParams();
 	const [product, setProduct] = useState<any>(null);
 	const [_loading, setLoading] = useState(true);
-
-	useEffect(() => {
-		if (!loading && !user) {
-			router.push("/admin/login");
-		}
-	}, [user, loading, router]);
 
 	useEffect(() => {
 		const loadProduct = async () => {
@@ -29,24 +24,24 @@ export default function EditProductPage() {
 	}, [params.id]);
 
 	const handleSubmit = async (data: any) => {
-		try {
-			await updateProduct(`${params.id}`, {
-				name: data.name,
-				brand: data.brand,
-				description: data.description,
-				price: parseFloat(data.price),
-				image: data.image,
-				ingredients: data.ingredients,
-			});
+		if (user && isAdmin) {
+			try {
+				await updateProduct(`${params.id}`, {
+					name: data.name,
+					brand: data.brand,
+					description: data.description,
+					price: parseFloat(data.price),
+					image: data.image,
+					ingredients: data.ingredients,
+				});
 
-			router.push("/admin/products");
-		} catch (error) {
-			console.error("Error updating product:", error);
-			alert("Failed to update product. Please try again.");
+				router.push("/admin/products");
+			} catch (error) {
+				console.error("Error updating product:", error);
+				alert("Failed to update product. Please try again.");
+			}
 		}
 	};
-
-	if (!user) return null;
 
 	if (_loading) {
 		return (

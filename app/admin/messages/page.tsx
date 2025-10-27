@@ -1,22 +1,17 @@
 "use client";
 
 import { AdminNav } from "@/components/admin-nav";
-import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Trash2, Check } from "lucide-react";
 import { getAllMessages, markMessageRead, deleteMessage } from "@/lib/firestore";
+import { RootState } from "@/store/store";
+import { useSelector } from "react-redux";
 
 export default function AdminMessagesPage() {
-	const { user, loading } = useAuth();
 	const router = useRouter();
+	const { user, isAdmin } = useSelector((state: RootState) => state.auth);
 	const [messages, setMessages] = useState<any[]>([]);
-
-	useEffect(() => {
-		if (!loading && !user) {
-			router.push("/admin/login");
-		}
-	}, [user, loading, router]);
 
 	// Load messages from Firestore
 	useEffect(() => {
@@ -34,27 +29,28 @@ export default function AdminMessagesPage() {
 
 	// Toggle read/unread in Firestore
 	const handleMarkAsRead = async (id: string) => {
-		try {
-			await markMessageRead(id);
-			// Update locally after successful Firestore update
-			setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, read: true } : m)));
-		} catch (error) {
-			console.error("Error marking message as read:", error);
+		if (user && isAdmin) {
+			try {
+				await markMessageRead(id);
+				// Update locally after successful Firestore update
+				setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, read: true } : m)));
+			} catch (error) {
+				console.error("Error marking message as read:", error);
+			}
 		}
 	};
 
 	// Delete message in Firestore
 	const handleDelete = async (id: string) => {
-		try {
-			await deleteMessage(id);
-			setMessages((prev) => prev.filter((m) => m.id !== id));
-		} catch (error) {
-			console.error("Error deleting message:", error);
+		if (user && isAdmin) {
+			try {
+				await deleteMessage(id);
+				setMessages((prev) => prev.filter((m) => m.id !== id));
+			} catch (error) {
+				console.error("Error deleting message:", error);
+			}
 		}
 	};
-
-	if (loading) return <p>Loading...</p>;
-	if (!user) return null;
 
 	return (
 		<main className="min-h-screen flex flex-col">
