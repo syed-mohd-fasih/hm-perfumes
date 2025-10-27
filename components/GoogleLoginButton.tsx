@@ -4,7 +4,7 @@ import { auth, googleProvider } from "@/lib/firebase";
 import { signInWithPopup, signOut } from "firebase/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser, setLoading } from "@/store/features/authSlice";
-import { RootState } from "@/store/store";
+import { persistor, RootState } from "@/store/store";
 import { LucideLogOut } from "lucide-react";
 
 export default function GoogleLoginButton() {
@@ -33,6 +33,7 @@ export default function GoogleLoginButton() {
 	const handleLogout = async () => {
 		await signOut(auth);
 		dispatch(setUser(null));
+		persistor.purge();
 	};
 
 	if (loading) return <p>Loading...</p>;

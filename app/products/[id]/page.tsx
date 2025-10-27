@@ -5,22 +5,20 @@ import { Footer } from "@/components/footer";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { ChevronRight } from "lucide-react";
 import { getProductById } from "@/lib/firestore";
-
-interface Product {
-	id: string;
-	name: string;
-	description: string;
-	price: number;
-	image: string;
-	ingredients: string;
-}
+import { useDispatch } from "react-redux";
+import { addToCart } from "@/store/features/cartSlice";
+import { ShoppingBag } from "lucide-react";
 
 export default function ProductDetailPage() {
 	const params = useParams();
 	const [product, setProduct] = useState<any>(null);
 	const [loading, setLoading] = useState(true);
+	const dispatch = useDispatch();
+
+	const handleAdd = () => {
+		dispatch(addToCart({ ...product, quantity: 1 }));
+	};
 
 	useEffect(() => {
 		const loadProduct = async () => {
@@ -97,13 +95,18 @@ export default function ProductDetailPage() {
 								</span>
 							</div>
 
-							<Link
+							{/* <Link
 								href={`/contact?product=${product.name}`}
 								className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-3xl shadow-lg px-8 py-4 font-semibold text-foreground hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-out flex items-center justify-center gap-2 group w-full"
 							>
 								Contact to Purchase
 								<ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-all duration-300 ease-out" />
-							</Link>
+							</Link> */}
+
+							<button onClick={handleAdd} className="mt-2 bg-black text-white py-2 px-4 rounded">
+								<ShoppingBag />
+								Add to Cart
+							</button>
 						</div>
 					</div>
 				</div>

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, X, Moon, Sun } from "lucide-react";
+import { Menu, X, Moon, Sun, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { useTheme } from "@/lib/theme-context";
 import GoogleLoginButton from "./GoogleLoginButton";
@@ -11,7 +11,7 @@ import { useSelector } from "react-redux";
 export function Navbar() {
 	const [isOpen, setIsOpen] = useState(false);
 	const { theme, toggleTheme } = useTheme();
-	const { isAdmin } = useSelector((state: RootState) => state.auth);
+	const { user, isAdmin } = useSelector((state: RootState) => state.auth);
 
 	return (
 		<nav className="sticky top-0 z-50 bg-white/10 dark:bg-black/10 backdrop-blur-md border border-white/20 dark:border-white/10 rounded-2xl m-4 md:m-6">
@@ -61,6 +61,11 @@ export function Navbar() {
 
 				<div className="hidden md:flex items-center gap-4">
 					<GoogleLoginButton />
+					{user && (
+						<Link href="/cart" className="p-2 rounded-full hover:bg-white/10 dark:hover:bg-white/5">
+							<ShoppingCart className="w-5 h-5" />
+						</Link>
+					)}
 					<button
 						onClick={toggleTheme}
 						className="p-2 rounded-full hover:bg-white/10 dark:hover:bg-white/5 transition-all duration-300 ease-out"
