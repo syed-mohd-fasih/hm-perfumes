@@ -103,13 +103,36 @@ export function Navbar() {
 					>
 						Contact
 					</Link>
-					<button
-						onClick={toggleTheme}
-						className="w-full py-2 px-4 rounded-full bg-white/10 dark:bg-white/5 hover:bg-white/20 dark:hover:bg-white/10 transition-all duration-300 ease-out flex items-center justify-center gap-2"
+					{isAdmin && (
+						<Link
+							href="/admin/dashboard"
+							className="text-foreground/70 hover:text-foreground transition-all duration-300 ease-out"
+						>
+							Admin Dashboard
+						</Link>
+					)}
+					<div
+						className="
+		pt-4 flex flex-col sm:flex-row 
+		items-center sm:justify-evenly gap-3 sm:gap-4
+		w-full
+	"
 					>
-						{theme === "light" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
-						{theme === "light" ? "Dark Mode" : "Light Mode"}
-					</button>
+						<button
+							onClick={toggleTheme}
+							className="
+			py-2 px-4 rounded-full 
+			bg-white/10 dark:bg-white/5 
+			hover:bg-white/20 dark:hover:bg-white/10 
+			transition-all duration-300 ease-out 
+			flex items-center justify-center gap-2 w-full sm:w-auto
+		"
+						>
+							{theme === "light" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+							{theme === "light" ? "Dark Mode" : "Light Mode"}
+						</button>
+						<GoogleLoginButton />
+					</div>
 				</div>
 			)}
 		</nav>

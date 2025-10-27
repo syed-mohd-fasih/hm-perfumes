@@ -47,7 +47,7 @@ export function AdminNav() {
 					className="px-6 py-2 bg-destructive text-destructive-foreground rounded-full hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-out text-sm font-medium flex items-center gap-2"
 				>
 					<LogOut className="w-4 h-4" />
-					Logout
+					Back to Home
 				</button>
 			</div>
 		</nav>

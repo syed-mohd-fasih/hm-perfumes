@@ -68,7 +68,7 @@ export default function AdminProductsPage() {
 											className="border-b border-border/50 hover:bg-white/5 transition-all duration-300 ease-out"
 										>
 											<td className="px-6 py-4">{product.name}</td>
-											<td className="px-6 py-4">${product.price.toFixed(2)}</td>
+											<td className="px-6 py-4">PKR {product.price.toFixed(2)}</td>
 											<td className="px-6 py-4 flex gap-3">
 												<Link
 													href={`/admin/products/${product.id}/edit`}

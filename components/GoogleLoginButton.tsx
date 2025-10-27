@@ -46,7 +46,15 @@ export default function GoogleLoginButton() {
 			</button>
 		</div>
 	) : (
-		<button onClick={handleLogin} className="px-4 py-2 bg-black text-white rounded-md">
+		<button
+			onClick={handleLogin}
+			className="px-4 py-2 rounded-md font-medium w-full
+			   bg-black text-white 
+			   hover:bg-gray-800
+			   dark:bg-white dark:text-black dark:hover:bg-gray-200
+			   transition-all duration-200 ease-in-out
+			   focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400"
+		>
 			Sign in with Google
 		</button>
 	);
