@@ -3,8 +3,8 @@
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import Link from "next/link";
-import { Trash2, ShoppingBag } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Trash2, ShoppingBag, X } from "lucide-react";
+import { useEffect } from "react";
 
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
@@ -56,7 +56,7 @@ export default function CartPage() {
 									>
 										<div className="flex-1">
 											<h3 className="font-semibold text-lg mb-2">{item.name}</h3>
-											<p className="text-secondary font-bold">${item.price.toFixed(2)}</p>
+											<p className="text-secondary font-bold">PKR {item.price.toFixed(2)}</p>
 										</div>
 
 										<div className="flex items-center gap-4">
@@ -101,7 +101,7 @@ export default function CartPage() {
 
 								<div className="flex justify-between text-xl font-bold mb-8">
 									<span>Total</span>
-									<span className="text-secondary">${totalAmount.toFixed(2)}</span>
+									<span className="text-secondary">PKR {totalAmount.toFixed(2)}</span>
 								</div>
 
 								<Link
@@ -113,16 +113,18 @@ export default function CartPage() {
 
 								<Link
 									href="/products"
-									className="w-full block text-center text-foreground/70 hover:text-foreground transition-all duration-300 ease-out py-2"
+									className="w-full block text-center text-foreground/70 hover:text-foreground transition-all duration-300 ease-out py-2 mb-3"
 								>
 									Continue Shopping
 								</Link>
 
-								<div className="flex gap-4">
-									<button onClick={() => dispatch(clearCart())} className="border px-4 py-2 rounded">
-										Clear Cart
-									</button>
-								</div>
+								<button
+									onClick={() => dispatch(clearCart())}
+									className="flex w-full justify-center items-center gap-2 px-4 py-2 rounded-full text-red-500 border border-red-500 hover:bg-red-500/10 transition-all duration-300 ease-out"
+								>
+									<Trash2 className="w-5 h-5" />
+									<span>Clear Cart</span>
+								</button>
 							</div>
 						</div>
 					)}
