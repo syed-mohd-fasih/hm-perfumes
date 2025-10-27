@@ -13,7 +13,7 @@ export default function AdminMessagesPage() {
 	const [messages, setMessages] = useState<any[]>([]);
 
 	useEffect(() => {
-		if (!loading && (!user || user.email !== "hmperfumes@gmail.com")) {
+		if (!loading && !user) {
 			router.push("/admin/login");
 		}
 	}, [user, loading, router]);

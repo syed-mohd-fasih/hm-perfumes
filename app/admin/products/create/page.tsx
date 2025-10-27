@@ -12,7 +12,7 @@ export default function CreateProductPage() {
 	const router = useRouter();
 
 	useEffect(() => {
-		if (!loading && (!user || user.email !== "hmperfumes@gmail.com")) {
+		if (!loading && !user) {
 			router.push("/admin/login");
 		}
 	}, [user, loading, router]);

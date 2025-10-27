@@ -13,7 +13,7 @@ export default function AdminDashboardPage() {
 	const [stats, setStats] = useState({ products: 0, messages: 0 });
 
 	useEffect(() => {
-		if (!loading && (!user || user.email !== "hmperfumes@gmail.com")) {
+		if (!loading && !user) {
 			router.push("/admin/login");
 		}
 	}, [user, loading, router]);

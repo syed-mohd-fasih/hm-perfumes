@@ -15,7 +15,7 @@ export default function EditProductPage() {
 	const [_loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		if (!loading && (!user || user.email !== "hmperfumes@gmail.com")) {
+		if (!loading && !user) {
 			router.push("/admin/login");
 		}
 	}, [user, loading, router]);
