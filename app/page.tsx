@@ -4,8 +4,28 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
+import { useEffect, useState } from "react";
+import { getShowcaseFullProducts } from "@/lib/firestore";
 
 export default function Home() {
+	const [showcase, setShowcase] = useState<any[]>([]);
+	const [loading, setLoading] = useState(true);
+
+	useEffect(() => {
+		const loadShowcase = async () => {
+			try {
+				const products = await getShowcaseFullProducts();
+				setShowcase(products);
+			} catch (err) {
+				console.error("Error loading showcase:", err);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		loadShowcase();
+	}, []);
+
 	return (
 		<main className="min-h-screen flex flex-col">
 			<Navbar />
@@ -44,23 +64,35 @@ export default function Home() {
 
 					{/* Featured Products Preview */}
 					<div className="pt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
-						{[
-							{ name: "Amber Essence", price: "$59.99", desc: "Warm & Rich" },
-							{ name: "Citrus Bloom", price: "$49.99", desc: "Fresh & Floral" },
-							{ name: "Midnight Musk", price: "$64.99", desc: "Deep & Sensual" },
-						].map((product, i) => (
-							<div
-								key={i}
-								className="bg-white/5 dark:bg-black/5 backdrop-blur-lg border border-white/10 dark:border-white/5 rounded-3xl shadow-lg p-6 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-out group cursor-pointer"
-							>
-								<div className="w-full h-48 bg-linear-to-br from-primary/20 to-accent/20 rounded-2xl mb-4 flex items-center justify-center">
-									<div className="text-4xl">💎</div>
+						{loading ? (
+							<p className="col-span-3 text-center text-foreground/60">Loading showcase...</p>
+						) : showcase.length > 0 ? (
+							showcase.map((product) => (
+								<div
+									key={product.id}
+									className="bg-white/5 dark:bg-black/5 backdrop-blur-lg border border-white/10 dark:border-white/5 rounded-3xl shadow-lg p-6 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-out group cursor-pointer"
+								>
+									<div className="w-full h-48 bg-linear-to-br from-primary/20 to-accent/20 rounded-2xl mb-4 flex items-center justify-center">
+										{product.image ? (
+											<img
+												src={product.image}
+												alt={product.name}
+												className="w-full h-full object-cover rounded-2xl"
+											/>
+										) : (
+											<div className="text-4xl">💎</div>
+										)}
+									</div>
+									<h3 className="font-semibold text-lg mb-1">{product.name}</h3>
+									<p className="text-sm text-foreground/60 mb-3">{product.description}</p>
+									<p className="text-secondary font-bold">${product.price.toFixed(2)}</p>
 								</div>
-								<h3 className="font-semibold text-lg mb-1">{product.name}</h3>
-								<p className="text-sm text-foreground/60 mb-3">{product.desc}</p>
-								<p className="text-secondary font-bold">{product.price}</p>
-							</div>
-						))}
+							))
+						) : (
+							<p className="col-span-3 text-center text-foreground/60">
+								No showcase products selected yet.
+							</p>
+						)}
 					</div>
 				</div>
 			</section>

@@ -75,7 +75,7 @@ export function ProductForm({ initialData, onSubmit, isLoading = false }: Produc
 			{/* --- Price --- */}
 			<div className="grid grid-cols-2 gap-4">
 				<div>
-					<label className="block text-sm font-medium mb-2">Price ($)</label>
+					<label className="block text-sm font-medium mb-2">Price (PKR)</label>
 					<input
 						type="number"
 						name="price"

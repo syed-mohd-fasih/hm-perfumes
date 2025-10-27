@@ -87,3 +87,45 @@ export async function deleteMessage(id: string) {
 	const docRef = doc(db, "messages", id);
 	await deleteDoc(docRef);
 }
+
+/* ------------------------------------------
+   🔸 SHOWCASE COLLECTION HELPERS
+------------------------------------------ */
+
+// Fetch all productIds for showcase
+export const getShowcaseProducts = async () => {
+	const snapshot = await getDocs(collection(db, "showcase"));
+	return snapshot.docs.map((doc) => doc.data().productId);
+};
+
+// Save exactly 3 productIds to showcase (using `productId` field)
+export const saveShowcaseProducts = async (productIds: string[]) => {
+	const showcaseRef = collection(db, "showcase");
+
+	// Clear old showcase entries
+	const existing = await getDocs(showcaseRef);
+	const deletePromises = existing.docs.map((d) => deleteDoc(doc(showcaseRef, d.id)));
+	await Promise.all(deletePromises);
+
+	// Add new showcase entries
+	const addPromises = productIds.map((id) =>
+		addDoc(showcaseRef, { productId: id, featuredAt: new Date().toISOString() })
+	);
+
+	await Promise.all(addPromises);
+};
+
+// Fetch all showcased products (full product objects)
+export const getShowcaseFullProducts = async () => {
+	const showcaseSnapshot = await getDocs(collection(db, "showcase"));
+	const showcaseIds = showcaseSnapshot.docs.map((doc) => doc.data().productId);
+
+	const productsSnapshot = await getDocs(collection(db, "products"));
+	const allProducts = productsSnapshot.docs.map((doc) => ({
+		id: doc.id,
+		...doc.data(),
+	}));
+
+	// Match products with showcase IDs (preserve order if needed)
+	return allProducts.filter((p) => showcaseIds.includes(p.id));
+};

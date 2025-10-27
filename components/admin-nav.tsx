@@ -35,6 +35,12 @@ export function AdminNav() {
 						Products
 					</Link>
 					<Link
+						href="/admin/showcase"
+						className="text-foreground/70 hover:text-foreground transition-all duration-300 ease-out"
+					>
+						Showcase
+					</Link>
+					<Link
 						href="/admin/messages"
 						className="text-foreground/70 hover:text-foreground transition-all duration-300 ease-out"
 					>

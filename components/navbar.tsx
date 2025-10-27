@@ -113,7 +113,7 @@ export function Navbar() {
 					)}
 					<div
 						className="
-		pt-4 flex flex-col sm:flex-row 
+		pt-6 flex flex-col sm:flex-row 
 		items-center sm:justify-evenly gap-3 sm:gap-4
 		w-full
 	"

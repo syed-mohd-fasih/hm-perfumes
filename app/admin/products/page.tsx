@@ -1,7 +1,6 @@
 "use client";
 
 import { AdminNav } from "@/components/admin-nav";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Trash2, Edit2 } from "lucide-react";
@@ -10,7 +9,6 @@ import { RootState } from "@/store/store";
 import { useSelector } from "react-redux";
 
 export default function AdminProductsPage() {
-	const router = useRouter();
 	const { user, isAdmin } = useSelector((state: RootState) => state.auth);
 	const [products, setProducts] = useState<any[]>([]);
 
