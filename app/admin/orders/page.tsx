@@ -49,7 +49,7 @@ export default function AdminOrdersPage() {
 	const statusCount = (status: string) => orders.filter((o) => o.status === status).length;
 
 	return (
-		<div className="min-h-screen bg-background text-foreground">
+		<div className="min-h-screen">
 			<AdminNav />
 
 			<main className="flex-1 px-4 py-20">

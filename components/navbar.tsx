@@ -12,6 +12,7 @@ export function Navbar() {
 	const [isOpen, setIsOpen] = useState(false);
 	const { theme, toggleTheme } = useTheme();
 	const { user, isAdmin } = useSelector((state: RootState) => state.auth);
+	const totalQuantity = useSelector((state: RootState) => state.cart.totalQuantity);
 
 	return (
 		<nav className="sticky top-0 z-50 bg-white/10 dark:bg-black/10 backdrop-blur-md border border-white/20 dark:border-white/10 rounded-2xl m-4 md:m-6">
@@ -63,8 +64,16 @@ export function Navbar() {
 					<GoogleLoginButton />
 					{user && (
 						<>
-							<Link href="/cart" className="p-2 rounded-full hover:bg-white/10 dark:hover:bg-white/5">
+							<Link
+								href="/cart"
+								className="relative p-2 rounded-full hover:bg-white/10 dark:hover:bg-white/5"
+							>
 								<ShoppingCart className="w-5 h-5" />
+								{totalQuantity > 0 && (
+									<span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-semibold rounded-full px-1.5">
+										{totalQuantity}
+									</span>
+								)}
 							</Link>
 							<Link href="/orders" className="p-2 rounded-full hover:bg-white/10 dark:hover:bg-white/5">
 								<ShoppingBag className="w-5 h-5" />
@@ -113,6 +122,22 @@ export function Navbar() {
 					>
 						Contact
 					</Link>
+					{user && (
+						<>
+							<Link
+								href="/cart"
+								className="block py-2 text-foreground/70 hover:text-foreground transition-all duration-300 ease-out"
+							>
+								Your Cart
+							</Link>
+							<Link
+								href="/orders"
+								className="block py-2 text-foreground/70 hover:text-foreground transition-all duration-300 ease-out"
+							>
+								Your Orders
+							</Link>
+						</>
+					)}
 					{isAdmin && (
 						<Link
 							href="/admin/dashboard"
@@ -123,20 +148,19 @@ export function Navbar() {
 					)}
 					<div
 						className="
-		pt-6 flex flex-col sm:flex-row 
-		items-center sm:justify-evenly gap-3 sm:gap-4
-		w-full
-	"
+							pt-12 flex flex-col sm:flex-row 
+							items-center sm:justify-evenly gap-3 sm:gap-4
+							w-full
+						"
 					>
 						<button
 							onClick={toggleTheme}
-							className="
-			py-2 px-4 rounded-full 
-			bg-white/10 dark:bg-white/5 
-			hover:bg-white/20 dark:hover:bg-white/10 
-			transition-all duration-300 ease-out 
-			flex items-center justify-center gap-2 w-full sm:w-auto
-		"
+							className="py-2 px-4 rounded-full 
+									bg-white/10 dark:bg-white/5 
+									hover:bg-white/20 dark:hover:bg-white/10 
+									transition-all duration-300 ease-out 
+									flex items-center justify-center gap-2 w-full sm:w-auto
+							"
 						>
 							{theme === "light" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
 							{theme === "light" ? "Dark Mode" : "Light Mode"}

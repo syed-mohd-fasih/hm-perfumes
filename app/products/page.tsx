@@ -8,12 +8,14 @@ import { getAllProducts } from "@/lib/firestore";
 
 export default function ProductsPage() {
 	const [products, setProducts] = useState<any[]>([]);
+	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
 		const loadProducts = async () => {
 			try {
 				getAllProducts().then(setProducts);
+				setLoading(false);
 			} catch (err) {
 				setError("Failed to load products. Please try again later.");
 				console.error("Error loading products:", err);
@@ -21,6 +23,18 @@ export default function ProductsPage() {
 		};
 		loadProducts();
 	}, []);
+
+	if (loading) {
+		<main className="min-h-screen flex flex-col">
+			<Navbar />
+			<section className="flex-1 px-4 py-20 flex items-center justify-center">
+				<div className="text-center">
+					<p className="text-lg text-foreground/60">Loading Products...</p>
+				</div>
+			</section>
+			<Footer />
+		</main>;
+	}
 
 	if (error) {
 		return (

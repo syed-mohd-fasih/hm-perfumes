@@ -8,7 +8,8 @@ import { useParams } from "next/navigation";
 import { getProductById } from "@/lib/firestore";
 import { useDispatch } from "react-redux";
 import { addToCart } from "@/store/features/cartSlice";
-import { ShoppingBag } from "lucide-react";
+import { ChevronLeft, ShoppingBag } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function ProductDetailPage() {
 	const params = useParams();
@@ -63,8 +64,11 @@ export default function ProductDetailPage() {
 
 			<section className="flex-1 px-4 py-20">
 				<div className="max-w-4xl mx-auto">
-					<Link href="/products" className="text-primary hover:underline mb-8 flex items-center gap-1">
-						← Back to products
+					<Link href="/products">
+						<Button variant="ghost" className="mb-6 dark:hover:bg-green-800">
+							<ChevronLeft className="w-4 h-4 mr-2" />
+							Back to Products
+						</Button>
 					</Link>
 
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-12">

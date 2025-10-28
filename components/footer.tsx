@@ -49,22 +49,6 @@ export function Footer() {
 						</ul>
 					</div>
 
-					{isAdmin && (
-						<div>
-							<h4 className="font-semibold mb-4">Admin</h4>
-							<ul className="space-y-2 text-sm text-foreground/60">
-								<li>
-									<Link
-										href="/admin/dashboard"
-										className="hover:text-foreground transition-all duration-300 ease-out"
-									>
-										Dashboard
-									</Link>
-								</li>
-							</ul>
-						</div>
-					)}
-
 					<div>
 						<h4 className="font-semibold mb-4">Brand</h4>
 						<p className="text-sm text-foreground/60">HM Perfumes © 2025</p>

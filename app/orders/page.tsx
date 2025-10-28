@@ -63,7 +63,7 @@ export default function OrdersPage() {
 	}, [user]);
 
 	return (
-		<div className="min-h-screen bg-white dark:bg-black flex flex-col">
+		<div className="min-h-screen flex flex-col">
 			<Navbar />
 
 			<main className="flex-1 py-12 px-4 sm:px-6 lg:px-8">
@@ -78,8 +78,8 @@ export default function OrdersPage() {
 
 					{/* --- No Orders --- */}
 					{!loading && orders.length === 0 && (
-						<Card className="p-12 text-center bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
-							<Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+						<Card className="p-12 text-center bg-white dark:bg-black border border-gray-200 dark:border-gray-600">
+							<Package className="w-12 h-12 text-back-400 mx-auto mb-4" />
 							<h3 className="text-lg font-semibold text-black dark:text-white mb-2">No orders yet</h3>
 							<p className="text-gray-600 dark:text-gray-400 mb-6">
 								Your recent orders will appear here once you make a purchase.

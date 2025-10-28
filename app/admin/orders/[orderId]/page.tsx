@@ -73,7 +73,7 @@ export default function AdminOrderDetailPage() {
 	};
 
 	return (
-		<div className="min-h-screen bg-white dark:bg-black">
+		<div className="min-h-screen">
 			<AdminNav />
 
 			<main className="py-12 px-4 sm:px-6 lg:px-8">
