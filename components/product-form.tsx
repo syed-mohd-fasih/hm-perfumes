@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type React from "react";
 import { UploadButton } from "@uploadthing/react";
-import type { OurFileRouter } from "@/app/api/uploadthing/core"; // adjust path if needed
+import type { OurFileRouter } from "@/app/api/uploadthing/core";
 
 interface ProductFormProps {
 	initialData?: {
@@ -110,7 +110,7 @@ export function ProductForm({ initialData, onSubmit, isLoading = false }: Produc
 						<UploadButton<OurFileRouter, "productImage">
 							endpoint="productImage"
 							onClientUploadComplete={(res) => {
-								const url = res?.[0]?.url;
+								const url = res?.[0]?.ufsUrl;
 								if (url) {
 									setFormData((prev) => ({ ...prev, image: url }));
 								}

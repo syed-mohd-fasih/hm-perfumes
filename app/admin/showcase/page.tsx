@@ -68,7 +68,7 @@ export default function ShowcasePage() {
 			<section className="flex-1 px-4 py-20">
 				<div className="max-w-7xl mx-auto">
 					<div className="mb-12">
-						<h1 className="text-5xl md:text-6xl font-bold mb-4 text-balance">Showcase Management</h1>
+						<h1 className="text-4xl font-bold mb-4">Showcase Management</h1>
 						<p className="text-lg text-foreground/60">
 							Select which products to feature on the home page ({selected.length}/3)
 						</p>

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, X, Moon, Sun, ShoppingCart } from "lucide-react";
+import { Menu, X, Moon, Sun, ShoppingCart, ShoppingBag } from "lucide-react";
 import { useState } from "react";
 import { useTheme } from "@/lib/theme-context";
 import GoogleLoginButton from "./GoogleLoginButton";
@@ -62,9 +62,14 @@ export function Navbar() {
 				<div className="hidden md:flex items-center gap-4">
 					<GoogleLoginButton />
 					{user && (
-						<Link href="/cart" className="p-2 rounded-full hover:bg-white/10 dark:hover:bg-white/5">
-							<ShoppingCart className="w-5 h-5" />
-						</Link>
+						<>
+							<Link href="/cart" className="p-2 rounded-full hover:bg-white/10 dark:hover:bg-white/5">
+								<ShoppingCart className="w-5 h-5" />
+							</Link>
+							<Link href="/orders" className="p-2 rounded-full hover:bg-white/10 dark:hover:bg-white/5">
+								<ShoppingBag className="w-5 h-5" />
+							</Link>
+						</>
 					)}
 					<button
 						onClick={toggleTheme}

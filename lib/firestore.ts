@@ -10,6 +10,9 @@ import {
 	serverTimestamp,
 	query,
 	orderBy,
+	where,
+	DocumentData,
+	FieldValue,
 } from "firebase/firestore";
 
 /* ------------------------------------------
@@ -128,4 +131,183 @@ export const getShowcaseFullProducts = async () => {
 
 	// Match products with showcase IDs (preserve order if needed)
 	return allProducts.filter((p) => showcaseIds.includes(p.id));
+};
+
+/* ------------------------------------------
+   🔸 ORDERS COLLECTION HELPERS
+------------------------------------------ */
+
+export interface OrderItem {
+	id: string;
+	quantity: number;
+}
+
+export interface ShippingAddress {
+	name: string;
+	phone: string;
+	address: string;
+}
+
+export interface OrderData {
+	id: string | null;
+	userId: string | null;
+	userEmail: string | null;
+	items: OrderItem[];
+	totalAmount: number;
+	paymentMethod: "cash" | "online";
+	paymentProofUrl?: string | undefined;
+	status: "pending" | "approved" | "declined" | "shipped" | "delivered";
+	createdAt: FieldValue;
+	shippingAddress: ShippingAddress;
+}
+
+// Create an order (Checkout page)
+export const createOrder = async (order: any) => {
+	try {
+		const docRef = await addDoc(collection(db, "orders"), {
+			...order,
+			status: "pending",
+			createdAt: serverTimestamp(),
+		});
+		return docRef.id;
+	} catch (error) {
+		console.error("Error creating order:", error);
+		throw error;
+	}
+};
+
+export async function getOrderById(orderId: string): Promise<OrderData | null> {
+	try {
+		const orderRef = doc(db, "orders", orderId);
+		const snapshot = await getDoc(orderRef);
+
+		if (!snapshot.exists()) return null;
+		const data = snapshot.data();
+
+		// Get all product IDs from order items
+		const itemIds = data.items.map((item: any) => item.id);
+
+		if (itemIds.length > 0) {
+			const productsRef = collection(db, "products");
+			const q = query(productsRef, where("__name__", "in", itemIds.slice(0, 10))); // Firestore 'in' limit = 10
+			const productSnapshots = await getDocs(q);
+
+			const productsMap: Record<string, DocumentData> = {};
+			productSnapshots.forEach((doc) => {
+				productsMap[doc.id] = doc.data();
+			});
+
+			// Merge product fields directly into item
+			data.items = data.items.map((item: any) => {
+				const product = productsMap[item.id];
+				return product
+					? {
+							...item,
+							name: product.name ?? "Unnamed Product",
+							price: product.price ?? 0,
+							image: product.image ?? null,
+					  }
+					: item;
+			});
+		}
+
+		return {
+			id: snapshot.id,
+			...data,
+			createdAt: data.createdAt?.toDate().toISOString() ?? null,
+		} as OrderData;
+	} catch (err) {
+		console.error("Error fetching order with product details:", err);
+		return null;
+	}
+}
+
+// Update Order Status (Admin Dashboard)
+export const updateOrderStatus = async (
+	orderId: string,
+	newStatus: "pending" | "approved" | "declined" | "shipped" | "delivered"
+) => {
+	try {
+		await updateDoc(doc(db, "orders", orderId), { status: newStatus });
+	} catch (error) {
+		console.error("Error updating order status:", error);
+	}
+};
+
+// Fetch user-specific order for tracking
+export const getUserOrders = async (userId: string) => {
+	const q = query(collection(db, "orders"), where("userId", "==", userId));
+	const snapshot = await getDocs(q);
+
+	const orders = await Promise.all(
+		snapshot.docs.map(async (d) => {
+			const order = d.data();
+
+			// Optional: populate product details for each item
+			const populatedItems = await Promise.all(
+				order.items.map(async (item: { id: string; quantity: number }) => {
+					const productRef = doc(db, "products", item.id);
+					const productSnap = await getDoc(productRef);
+
+					if (productSnap.exists()) {
+						const productData = productSnap.data();
+						return {
+							...item,
+							name: productData.name,
+							image: productData.image,
+							price: productData.price,
+						};
+					} else {
+						return item; // fallback if product was deleted
+					}
+				})
+			);
+
+			return {
+				id: d.id,
+				...order,
+				items: populatedItems,
+			};
+		})
+	);
+
+	return orders;
+};
+
+// Fetch all orders for admin dashboard
+export const getAllOrders = async () => {
+	const snapshot = await getDocs(collection(db, "orders"));
+
+	const orders = await Promise.all(
+		snapshot.docs.map(async (d) => {
+			const order = d.data();
+
+			const populatedItems = await Promise.all(
+				order.items.map(async (item: { id: string; quantity: number }) => {
+					const productRef = doc(db, "products", item.id);
+					const productSnap = await getDoc(productRef);
+
+					if (productSnap.exists()) {
+						const productData = productSnap.data();
+						return {
+							...item,
+							name: productData.name,
+							image: productData.image,
+							price: productData.price,
+						};
+					} else {
+						return item;
+					}
+				})
+			);
+
+			return {
+				id: d.id,
+				...order,
+				items: populatedItems,
+			};
+		})
+	);
+
+	return orders;
 };

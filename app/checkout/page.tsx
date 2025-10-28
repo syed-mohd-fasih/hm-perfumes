@@ -1,254 +1,251 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { Navbar } from "@/components/navbar"
-import { Footer } from "@/components/footer"
-import Link from "next/link"
-import { CheckCircle } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "@/store/store";
+import { clearCart } from "@/store/features/cartSlice";
+import { Navbar } from "@/components/navbar";
+import { Footer } from "@/components/footer";
+import { CheckCircle } from "lucide-react";
+import { UploadButton } from "@uploadthing/react";
+import type { OurFileRouter } from "@/app/api/uploadthing/core";
+import { createOrder } from "@/lib/firestore";
+import { serverTimestamp } from "firebase/firestore";
 
 export default function CheckoutPage() {
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    address: "",
-    city: "",
-    state: "",
-    zipCode: "",
-    cardName: "",
-    cardNumber: "",
-    expiry: "",
-    cvv: "",
-  })
+	const router = useRouter();
+	const dispatch = useDispatch();
 
-  const [isSubmitted, setIsSubmitted] = useState(false)
+	const { user } = useSelector((state: RootState) => state.auth);
+	const { items, totalAmount } = useSelector((state: RootState) => state.cart);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+	const [isSubmitted, setIsSubmitted] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
+	const [uploading, setUploading] = useState(false);
+	const [paymentProofUrl, setPaymentProofUrl] = useState<string | null>(null);
+	const [paymentMethod, setPaymentMethod] = useState<"cash" | "online">("cash");
+	const [status, setStatus] = useState<"pending" | "approved" | "declined" | "shipped" | "delivered">("pending");
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitted(true)
-  }
+	const [formData, setFormData] = useState({
+		name: "",
+		phone: "",
+		address: "",
+	});
 
-  if (isSubmitted) {
-    return (
-      <main className="min-h-screen flex flex-col">
-        <Navbar />
+	useEffect(() => {
+		if (!user) router.push("/");
+	}, [user, router]);
 
-        <section className="flex-1 px-4 py-20 flex items-center justify-center">
-          <div className="max-w-2xl w-full text-center">
-            <div className="bg-white/5 dark:bg-black/5 backdrop-blur-lg border border-white/10 dark:border-white/5 rounded-3xl shadow-lg p-12">
-              <CheckCircle className="w-20 h-20 mx-auto mb-6 text-primary" />
-              <h1 className="text-4xl font-bold mb-4">Order Confirmed!</h1>
-              <p className="text-lg text-foreground/60 mb-8">
-                Thank you for your purchase. Your order has been successfully placed.
-              </p>
-              <p className="text-foreground/60 mb-8">
-                A confirmation email has been sent to <span className="font-semibold">{formData.email}</span>
-              </p>
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const { name, value } = e.target;
+		setFormData((prev) => ({ ...prev, [name]: value }));
+	};
 
-              <Link
-                href="/products"
-                className="inline-block bg-white/5 dark:bg-black/5 backdrop-blur-lg border border-white/10 dark:border-white/5 rounded-3xl shadow-lg px-8 py-4 font-semibold text-foreground hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-out"
-              >
-                Continue Shopping
-              </Link>
-            </div>
-          </div>
-        </section>
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+		setIsLoading(true);
 
-        <Footer />
-      </main>
-    )
-  }
+		try {
+			const orderData = {
+				userId: user?.uid || null,
+				userEmail: user?.email || null,
+				items: items.map((i) => ({
+					id: i.id,
+					quantity: i.quantity,
+				})),
+				totalAmount,
+				paymentMethod,
+				paymentProofUrl: paymentMethod === "online" ? paymentProofUrl : "",
+				shippingAddress: {
+					name: formData.name,
+					phone: formData.phone,
+					address: formData.address,
+				},
+			};
 
-  return (
-    <main className="min-h-screen flex flex-col">
-      <Navbar />
+			await createOrder(orderData);
+			dispatch(clearCart());
+			setIsSubmitted(true);
+		} catch (error) {
+			console.error("Order creation failed:", error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
 
-      <section className="flex-1 px-4 py-20">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-12">
-            <h1 className="text-5xl md:text-6xl font-bold mb-4 text-balance">Checkout</h1>
-            <p className="text-lg text-foreground/60">Complete your purchase</p>
-          </div>
+	if (isSubmitted) {
+		return (
+			<main className="min-h-screen flex flex-col">
+				<Navbar />
+				<section className="flex-1 px-4 py-20 flex items-center justify-center">
+					<div className="max-w-2xl w-full text-center">
+						<div className="bg-white/5 dark:bg-black/5 backdrop-blur-lg border border-white/10 rounded-3xl shadow-lg p-12">
+							<CheckCircle className="w-20 h-20 mx-auto mb-6 text-primary" />
+							<h1 className="text-4xl font-bold mb-4">Order Confirmed!</h1>
+							<p className="text-lg text-foreground/60 mb-8">
+								Thank you for your purchase. Your order has been successfully placed.
+							</p>
+							<div className="flex justify-center gap-4">
+								<Link
+									href="/products"
+									className="px-8 py-4 rounded-3xl border border-white/10 backdrop-blur-lg font-semibold text-foreground hover:shadow-2xl hover:-translate-y-1 transition-all"
+								>
+									Continue Shopping
+								</Link>
+								<Link
+									href="/orders"
+									className="px-8 py-4 rounded-3xl border border-white/10 backdrop-blur-lg font-semibold text-foreground hover:shadow-2xl hover:-translate-y-1 transition-all"
+								>
+									Track your Orders
+								</Link>
+							</div>
+						</div>
+					</div>
+				</section>
+				<Footer />
+			</main>
+		);
+	}
 
-          <form onSubmit={handleSubmit} className="space-y-8">
-            {/* Shipping Information */}
-            <div className="bg-white/5 dark:bg-black/5 backdrop-blur-lg border border-white/10 dark:border-white/5 rounded-3xl shadow-lg p-8">
-              <h2 className="text-2xl font-bold mb-6">Shipping Information</h2>
+	return (
+		<main className="min-h-screen flex flex-col">
+			<Navbar />
+			<section className="flex-1 px-4 py-20">
+				<div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+					{/* LEFT COLUMN (2/3): Shipping + Payment */}
+					<div className="lg:col-span-2 space-y-8">
+						{/* Shipping Information */}
+						<div className="bg-white/5 dark:bg-black/5 backdrop-blur-lg border border-white/10 rounded-3xl shadow-lg p-8">
+							<h2 className="text-2xl font-bold mb-6">Shipping Information</h2>
+							<div className="space-y-4">
+								<input
+									type="text"
+									name="name"
+									placeholder="Full Name"
+									value={formData.name}
+									onChange={handleChange}
+									required
+									className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:ring-2 focus:ring-primary/50 outline-none"
+								/>
+								<input
+									type="tel"
+									name="phone"
+									placeholder="Phone Number"
+									value={formData.phone}
+									onChange={handleChange}
+									required
+									className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:ring-2 focus:ring-primary/50 outline-none"
+								/>
+								<input
+									type="text"
+									name="address"
+									placeholder="Complete Address"
+									value={formData.address}
+									onChange={handleChange}
+									required
+									className="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 focus:ring-2 focus:ring-primary/50 outline-none"
+								/>
+							</div>
+						</div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <input
-                  type="text"
-                  name="firstName"
-                  placeholder="First Name"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  required
-                  className="bg-white/5 dark:bg-black/5 border border-white/10 dark:border-white/5 rounded-2xl px-4 py-3 text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-300 ease-out"
-                />
-                <input
-                  type="text"
-                  name="lastName"
-                  placeholder="Last Name"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  required
-                  className="bg-white/5 dark:bg-black/5 border border-white/10 dark:border-white/5 rounded-2xl px-4 py-3 text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-300 ease-out"
-                />
-              </div>
+						{/* Payment Information */}
+						<div className="bg-white/5 dark:bg-black/5 backdrop-blur-lg border border-white/10 rounded-3xl shadow-lg p-8">
+							<h2 className="text-2xl font-bold mb-6">Payment Method</h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  className="bg-white/5 dark:bg-black/5 border border-white/10 dark:border-white/5 rounded-2xl px-4 py-3 text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-300 ease-out"
-                />
-                <input
-                  type="tel"
-                  name="phone"
-                  placeholder="Phone Number"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  required
-                  className="bg-white/5 dark:bg-black/5 border border-white/10 dark:border-white/5 rounded-2xl px-4 py-3 text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-300 ease-out"
-                />
-              </div>
+							<div className="flex flex-col gap-4">
+								<label className="flex items-center gap-3">
+									<input
+										type="radio"
+										name="paymentMethod"
+										value="cash"
+										checked={paymentMethod === "cash"}
+										onChange={() => setPaymentMethod("cash")}
+										className="w-5 h-5 accent-primary"
+									/>
+									<span className="text-foreground/80 font-medium">Cash on Delivery</span>
+								</label>
 
-              <input
-                type="text"
-                name="address"
-                placeholder="Street Address"
-                value={formData.address}
-                onChange={handleChange}
-                required
-                className="w-full bg-white/5 dark:bg-black/5 border border-white/10 dark:border-white/5 rounded-2xl px-4 py-3 text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-300 ease-out mb-4"
-              />
+								<label className="flex items-center gap-3">
+									<input
+										type="radio"
+										name="paymentMethod"
+										value="online"
+										checked={paymentMethod === "online"}
+										onChange={() => setPaymentMethod("online")}
+										className="w-5 h-5 accent-primary"
+									/>
+									<span className="text-foreground/80 font-medium">Online Payment</span>
+								</label>
+							</div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <input
-                  type="text"
-                  name="city"
-                  placeholder="City"
-                  value={formData.city}
-                  onChange={handleChange}
-                  required
-                  className="bg-white/5 dark:bg-black/5 border border-white/10 dark:border-white/5 rounded-2xl px-4 py-3 text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-300 ease-out"
-                />
-                <input
-                  type="text"
-                  name="state"
-                  placeholder="State"
-                  value={formData.state}
-                  onChange={handleChange}
-                  required
-                  className="bg-white/5 dark:bg-black/5 border border-white/10 dark:border-white/5 rounded-2xl px-4 py-3 text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-300 ease-out"
-                />
-                <input
-                  type="text"
-                  name="zipCode"
-                  placeholder="ZIP Code"
-                  value={formData.zipCode}
-                  onChange={handleChange}
-                  required
-                  className="bg-white/5 dark:bg-black/5 border border-white/10 dark:border-white/5 rounded-2xl px-4 py-3 text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-300 ease-out"
-                />
-              </div>
-            </div>
+							{/* Upload section for online payments */}
+							{paymentMethod === "online" && (
+								<div className="mt-6 space-y-3">
+									<p className="text-foreground/70">
+										Please upload a screenshot of your payment receipt or transaction proof.
+									</p>
 
-            {/* Payment Information */}
-            <div className="bg-white/5 dark:bg-black/5 backdrop-blur-lg border border-white/10 dark:border-white/5 rounded-3xl shadow-lg p-8">
-              <h2 className="text-2xl font-bold mb-6">Payment Information</h2>
+									<UploadButton<OurFileRouter, "paymentProofUploader">
+										endpoint="paymentProofUploader"
+										onClientUploadComplete={(res) => {
+											setPaymentProofUrl(res?.[0]?.url);
+											setUploading(false);
+										}}
+										onUploadError={(err) => {
+											alert(`Upload failed: ${err.message}`);
+											setUploading(false);
+										}}
+										onUploadBegin={() => setUploading(true)}
+									/>
 
-              <input
-                type="text"
-                name="cardName"
-                placeholder="Cardholder Name"
-                value={formData.cardName}
-                onChange={handleChange}
-                required
-                className="w-full bg-white/5 dark:bg-black/5 border border-white/10 dark:border-white/5 rounded-2xl px-4 py-3 text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-300 ease-out mb-4"
-              />
+									{paymentProofUrl && (
+										<p className="text-sm text-green-500 mt-2">✅ Proof uploaded successfully!</p>
+									)}
+								</div>
+							)}
+						</div>
+					</div>
 
-              <input
-                type="text"
-                name="cardNumber"
-                placeholder="Card Number"
-                value={formData.cardNumber}
-                onChange={handleChange}
-                required
-                className="w-full bg-white/5 dark:bg-black/5 border border-white/10 dark:border-white/5 rounded-2xl px-4 py-3 text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-300 ease-out mb-4"
-              />
+					{/* RIGHT COLUMN (1/3): Order Summary */}
+					<div className="bg-white/5 dark:bg-black/5 backdrop-blur-lg border border-white/10 rounded-3xl shadow-lg p-8">
+						<h2 className="text-2xl font-bold mb-6">Order Summary</h2>
+						<div className="space-y-4 max-h-[300px] overflow-y-auto">
+							{items.map((item) => (
+								<div key={item.id} className="flex justify-between items-center pb-3">
+									<div>
+										<p className="font-medium">{item.name}</p>
+										<p className="text-sm text-foreground/60">Qty: {item.quantity}</p>
+									</div>
+									<p className="text-foreground/80">PKR {(item.price * item.quantity).toFixed(2)}</p>
+								</div>
+							))}
+						</div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <input
-                  type="text"
-                  name="expiry"
-                  placeholder="MM/YY"
-                  value={formData.expiry}
-                  onChange={handleChange}
-                  required
-                  className="bg-white/5 dark:bg-black/5 border border-white/10 dark:border-white/5 rounded-2xl px-4 py-3 text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-300 ease-out"
-                />
-                <input
-                  type="text"
-                  name="cvv"
-                  placeholder="CVV"
-                  value={formData.cvv}
-                  onChange={handleChange}
-                  required
-                  className="bg-white/5 dark:bg-black/5 border border-white/10 dark:border-white/5 rounded-2xl px-4 py-3 text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-300 ease-out"
-                />
-              </div>
-            </div>
+						<div className="border-t border-white/10 mt-6 pt-6 space-y-3 text-foreground/70">
+							<div className="flex justify-between text-xl font-semibold">
+								<span>Total</span>
+								<span className="text-secondary">PKR {totalAmount.toFixed(2)}</span>
+							</div>
+						</div>
 
-            {/* Order Summary */}
-            <div className="bg-white/5 dark:bg-black/5 backdrop-blur-lg border border-white/10 dark:border-white/5 rounded-3xl shadow-lg p-8">
-              <h2 className="text-2xl font-bold mb-6">Order Summary</h2>
-
-              <div className="space-y-3 mb-6 pb-6 border-b border-white/10">
-                <div className="flex justify-between text-foreground/70">
-                  <span>Subtotal</span>
-                  <span>$174.97</span>
-                </div>
-                <div className="flex justify-between text-foreground/70">
-                  <span>Shipping</span>
-                  <span>$10.00</span>
-                </div>
-                <div className="flex justify-between text-foreground/70">
-                  <span>Tax</span>
-                  <span>$18.50</span>
-                </div>
-              </div>
-
-              <div className="flex justify-between text-xl font-bold mb-8">
-                <span>Total</span>
-                <span className="text-secondary">$203.47</span>
-              </div>
-
-              <button
-                type="submit"
-                className="w-full bg-white/5 dark:bg-black/5 backdrop-blur-lg border border-white/10 dark:border-white/5 rounded-3xl shadow-lg px-8 py-4 font-semibold text-foreground hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-out"
-              >
-                Complete Purchase
-              </button>
-            </div>
-          </form>
-        </div>
-      </section>
-
-      <Footer />
-    </main>
-  )
+						<button
+							onClick={handleSubmit}
+							disabled={isLoading || (paymentMethod === "online" && (uploading || !paymentProofUrl))}
+							className={`w-full mt-8 px-8 py-4 rounded-3xl font-semibold transition-all duration-300 ease-out
+								${
+									isLoading || (paymentMethod === "online" && (uploading || !paymentProofUrl))
+										? "bg-gray-500/40 cursor-not-allowed"
+										: "bg-primary hover:bg-primary/90 text-white"
+								}`}
+						>
+							{isLoading ? "Placing Order..." : "Complete Purchase"}
+						</button>
+					</div>
+				</div>
+			</section>
+			<Footer />
+		</main>
+	);
 }

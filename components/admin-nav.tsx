@@ -41,6 +41,12 @@ export function AdminNav() {
 						Showcase
 					</Link>
 					<Link
+						href="/admin/orders"
+						className="text-foreground/70 hover:text-foreground transition-all duration-300 ease-out"
+					>
+						Orders
+					</Link>
+					<Link
 						href="/admin/messages"
 						className="text-foreground/70 hover:text-foreground transition-all duration-300 ease-out"
 					>

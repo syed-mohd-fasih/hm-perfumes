@@ -95,17 +95,12 @@ export default function ProductDetailPage() {
 								</span>
 							</div>
 
-							{/* <Link
-								href={`/contact?product=${product.name}`}
+							<button
+								onClick={handleAdd}
 								className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-3xl shadow-lg px-8 py-4 font-semibold text-foreground hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-out flex items-center justify-center gap-2 group w-full"
 							>
-								Contact to Purchase
-								<ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-all duration-300 ease-out" />
-							</Link> */}
-
-							<button onClick={handleAdd} className="mt-2 bg-black text-white py-2 px-4 rounded">
-								<ShoppingBag />
 								Add to Cart
+								<ShoppingBag className="w-5 h-5 group-hover:translate-x-1 transition-all duration-300 ease-out" />
 							</button>
 						</div>
 					</div>
