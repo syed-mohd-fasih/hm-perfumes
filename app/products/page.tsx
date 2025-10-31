@@ -8,8 +8,6 @@ import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
 import { fetchProducts } from "@/store/features/productsSlice";
 
 export default function ProductsPage() {
-	// const [products, setProducts] = useState<any[]>([]);
-
 	const dispatch = useAppDispatch();
 	const { items, loading } = useAppSelector((state) => state.products);
 

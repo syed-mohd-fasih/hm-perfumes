@@ -5,19 +5,21 @@ import storage from "redux-persist/lib/storage";
 import authReducer from "./features/authSlice";
 import cartReducer from "./features/cartSlice";
 import productsReducer from "./features/productsSlice";
+import showcaseReducer from "./features/showcaseSlice";
 
 // --- Combined Slices ---
 const rootReducer = combineReducers({
 	auth: authReducer,
 	cart: cartReducer,
 	products: productsReducer,
+	showcase: showcaseReducer,
 });
 
 // --- Persistence Config ---
 const persistConfig = {
 	key: "root",
 	storage,
-	whitelist: ["cart", "products"],
+	whitelist: ["cart", "products", "showcase"],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

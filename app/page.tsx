@@ -4,27 +4,20 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+
+import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
+import { fetchShowcase } from "@/store/features/showcaseSlice";
+
 import { getShowcaseFullProducts } from "@/lib/firestore";
 
 export default function Home() {
-	const [showcase, setShowcase] = useState<any[]>([]);
-	const [loading, setLoading] = useState(true);
+	const dispatch = useAppDispatch();
+	const { items, loading } = useAppSelector((state) => state.showcase);
 
 	useEffect(() => {
-		const loadShowcase = async () => {
-			try {
-				const products = await getShowcaseFullProducts();
-				setShowcase(products);
-			} catch (err) {
-				console.error("Error loading showcase:", err);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		loadShowcase();
-	}, []);
+		dispatch(fetchShowcase());
+	}, [dispatch]);
 
 	return (
 		<main className="min-h-screen flex flex-col">
@@ -66,8 +59,8 @@ export default function Home() {
 					<div className="pt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
 						{loading ? (
 							<p className="col-span-3 text-center text-foreground/60">Loading showcase...</p>
-						) : showcase.length > 0 ? (
-							showcase.map((product) => (
+						) : items.length > 0 ? (
+							items.map((product) => (
 								<div
 									key={product.id}
 									className="bg-white/5 dark:bg-black/5 backdrop-blur-lg border border-white/10 dark:border-white/5 rounded-3xl shadow-lg p-6 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-out group cursor-pointer"
