@@ -140,7 +140,9 @@ export default function AdminOrdersPage() {
 															return dateObj.toLocaleDateString();
 														})()}
 													</td>
-													<td className="px-6 py-4">{order.items.length}</td>
+													<td className="px-6 py-4">
+														{order.items.reduce((total, item) => total + item.quantity, 0)}
+													</td>
 													<td className="px-6 py-4 font-semibold text-emerald-500">
 														PKR {order.totalAmount.toFixed(2)}
 													</td>
