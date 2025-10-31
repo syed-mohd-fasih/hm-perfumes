@@ -3,26 +3,19 @@
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { getAllProducts } from "@/lib/firestore";
+import { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
+import { fetchProducts } from "@/store/features/productsSlice";
 
 export default function ProductsPage() {
-	const [products, setProducts] = useState<any[]>([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState<string | null>(null);
+	// const [products, setProducts] = useState<any[]>([]);
+
+	const dispatch = useAppDispatch();
+	const { items, loading } = useAppSelector((state) => state.products);
 
 	useEffect(() => {
-		const loadProducts = async () => {
-			try {
-				getAllProducts().then(setProducts);
-				setLoading(false);
-			} catch (err) {
-				setError("Failed to load products. Please try again later.");
-				console.error("Error loading products:", err);
-			}
-		};
-		loadProducts();
-	}, []);
+		dispatch(fetchProducts());
+	}, [dispatch]);
 
 	if (loading) {
 		<main className="min-h-screen flex flex-col">
@@ -34,20 +27,6 @@ export default function ProductsPage() {
 			</section>
 			<Footer />
 		</main>;
-	}
-
-	if (error) {
-		return (
-			<main className="min-h-screen flex flex-col">
-				<Navbar />
-				<section className="flex-1 px-4 py-20 flex items-center justify-center">
-					<div className="text-center">
-						<p className="text-lg text-foreground/60">{error}</p>
-					</div>
-				</section>
-				<Footer />
-			</main>
-		);
 	}
 
 	return (
@@ -62,7 +41,7 @@ export default function ProductsPage() {
 					</div>
 
 					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-						{products.map((product) => (
+						{items.map((product) => (
 							<Link key={product.id} href={`/products/${product.id}`}>
 								<div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-3xl shadow-lg p-6 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-out group cursor-pointer h-full flex flex-col">
 									<div className="w-full h-48 bg-linear-to-br from-primary/20 to-accent/20 rounded-2xl mb-4 flex items-center justify-center overflow-hidden">
