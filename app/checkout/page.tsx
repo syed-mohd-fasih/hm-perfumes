@@ -12,7 +12,6 @@ import { CheckCircle } from "lucide-react";
 import { UploadButton } from "@uploadthing/react";
 import type { OurFileRouter } from "@/app/api/uploadthing/core";
 import { createOrder } from "@/lib/firestore";
-import { serverTimestamp } from "firebase/firestore";
 
 export default function CheckoutPage() {
 	const router = useRouter();
@@ -26,7 +25,6 @@ export default function CheckoutPage() {
 	const [uploading, setUploading] = useState(false);
 	const [paymentProofUrl, setPaymentProofUrl] = useState<string | null>(null);
 	const [paymentMethod, setPaymentMethod] = useState<"cash" | "online">("cash");
-	const [status, setStatus] = useState<"pending" | "approved" | "declined" | "shipped" | "delivered">("pending");
 
 	const [formData, setFormData] = useState({
 		name: "",
