@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { addProduct } from "@/lib/firestore";
 import { RootState } from "@/store/store";
 import { useSelector } from "react-redux";
+import { toast } from "sonner";
 
 export default function CreateProductPage() {
 	const { user, isAdmin } = useSelector((state: RootState) => state.auth);
@@ -23,6 +24,7 @@ export default function CreateProductPage() {
 					ingredients: data.ingredients,
 				});
 
+				toast.success("Product created successfully!");
 				router.push("/admin/products");
 			} catch (error) {
 				console.error("Error adding product:", error);

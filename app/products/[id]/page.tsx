@@ -10,6 +10,7 @@ import { useDispatch } from "react-redux";
 import { addToCart } from "@/store/features/cartSlice";
 import { ChevronLeft, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export default function ProductDetailPage() {
 	const params = useParams();
@@ -19,6 +20,7 @@ export default function ProductDetailPage() {
 
 	const handleAdd = () => {
 		dispatch(addToCart({ ...product, quantity: 1 }));
+		toast.success("Item Added to cart!");
 	};
 
 	useEffect(() => {

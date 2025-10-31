@@ -7,6 +7,7 @@ import { Trash2, Edit2 } from "lucide-react";
 import { getAllProducts, deleteProduct } from "@/lib/firestore";
 import { RootState } from "@/store/store";
 import { useSelector } from "react-redux";
+import { toast } from "sonner";
 
 export default function AdminProductsPage() {
 	const { user, isAdmin } = useSelector((state: RootState) => state.auth);
@@ -27,8 +28,9 @@ export default function AdminProductsPage() {
 			try {
 				await deleteProduct(id);
 				setProducts((prev) => prev.filter((p) => p.id !== id));
+				toast.success("Product deleted successfully!");
 			} catch (error) {
-				console.error("Error deleting product:", error);
+				toast.error(`Error deleting product: ${error}`);
 			}
 		}
 	};

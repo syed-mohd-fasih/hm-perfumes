@@ -5,6 +5,7 @@ import { AdminNav } from "@/components/admin-nav";
 import { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { getAllProducts, getShowcaseProducts, saveShowcaseProducts } from "@/lib/firestore";
+import { toast } from "sonner";
 
 export default function ShowcasePage() {
 	const [products, setProducts] = useState<any[]>([]);
@@ -50,10 +51,11 @@ export default function ShowcasePage() {
 		setSaving(true);
 		try {
 			await saveShowcaseProducts(selected);
-			alert("Showcase updated successfully!");
+			toast.success("Showcase updated successfully!");
 		} catch (err) {
 			console.error(err);
 			alert("Error saving showcase.");
+			toast.error("Error saving showcase.");
 		} finally {
 			setSaving(false);
 		}

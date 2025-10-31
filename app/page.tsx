@@ -61,25 +61,27 @@ export default function Home() {
 							<p className="col-span-3 text-center text-foreground/60">Loading showcase...</p>
 						) : items.length > 0 ? (
 							items.map((product) => (
-								<div
-									key={product.id}
-									className="bg-white/5 dark:bg-black/5 backdrop-blur-lg border border-white/10 dark:border-white/5 rounded-3xl shadow-lg p-6 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-out group cursor-pointer"
-								>
-									<div className="w-full h-48 bg-linear-to-br from-primary/20 to-accent/20 rounded-2xl mb-4 flex items-center justify-center">
-										{product.image ? (
-											<img
-												src={product.image}
-												alt={product.name}
-												className="w-full h-full object-cover rounded-2xl"
-											/>
-										) : (
-											<div className="text-4xl">💎</div>
-										)}
+								<Link key={product.id} href={`/products/${product.id}`}>
+									<div
+										key={product.id}
+										className="bg-white/5 dark:bg-black/5 backdrop-blur-lg border border-white/10 dark:border-white/5 rounded-3xl shadow-lg p-6 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 ease-out group cursor-pointer"
+									>
+										<div className="w-full h-48 bg-linear-to-br from-primary/20 to-accent/20 rounded-2xl mb-4 flex items-center justify-center">
+											{product.image ? (
+												<img
+													src={product.image}
+													alt={product.name}
+													className="w-full h-full object-cover rounded-2xl"
+												/>
+											) : (
+												<div className="text-4xl">💎</div>
+											)}
+										</div>
+										<h3 className="font-semibold text-lg mb-1">{product.name}</h3>
+										<p className="text-sm text-foreground/60 mb-3">{product.description}</p>
+										<p className="text-secondary font-bold">PKR {product.price.toFixed(2)}</p>
 									</div>
-									<h3 className="font-semibold text-lg mb-1">{product.name}</h3>
-									<p className="text-sm text-foreground/60 mb-3">{product.description}</p>
-									<p className="text-secondary font-bold">${product.price.toFixed(2)}</p>
-								</div>
+								</Link>
 							))
 						) : (
 							<p className="col-span-3 text-center text-foreground/60">

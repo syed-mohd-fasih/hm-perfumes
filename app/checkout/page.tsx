@@ -8,10 +8,12 @@ import { RootState } from "@/store/store";
 import { clearCart } from "@/store/features/cartSlice";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, RefreshCcw } from "lucide-react";
 import { UploadButton } from "@uploadthing/react";
 import type { OurFileRouter } from "@/app/api/uploadthing/core";
 import { createOrder } from "@/lib/firestore";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 
 export default function CheckoutPage() {
 	const router = useRouter();
@@ -66,8 +68,10 @@ export default function CheckoutPage() {
 			await createOrder(orderData);
 			dispatch(clearCart());
 			setIsSubmitted(true);
+			toast.success("Your order has been sent!");
 		} catch (error) {
 			console.error("Order creation failed:", error);
+			toast.error(`Order Creation failed:, ${error}`);
 		} finally {
 			setIsLoading(false);
 		}
@@ -181,9 +185,31 @@ export default function CheckoutPage() {
 							{/* Upload section for online payments */}
 							{paymentMethod === "online" && (
 								<div className="mt-6 space-y-3">
-									<p className="text-foreground/70">
-										Please upload a screenshot of your payment receipt or transaction proof.
+									<p className="text-foreground/70 mb-4">
+										Please upload a sreenshot of your payment receipt or transaction proof.
 									</p>
+									<p className="text-amber-300 text-sm mb-6">
+										A payment portal for secure in-app transactions may be added soon! Please use
+										the account mentioned below for manual transactions. Sorry for the
+										inconvenience. Please leave us a message on our{" "}
+										<Link className="text-foreground underline" href={"/contact"}>
+											Contact Page
+										</Link>{" "}
+										in case of any issues!
+									</p>
+
+									<div className="mb-12 p-8 rounded-2xl border border-b-green-500 flex justify-between items-center">
+										<div>
+											<p className="text-green-500">Active Account Details</p>
+											<p className="text-green-500">No.: 1234567890</p>
+											<p className="text-green-500">Bank: Easypaisa</p>
+										</div>
+										<div>
+											<Button>
+												<RefreshCcw className="w-5 h-5" />
+											</Button>
+										</div>
+									</div>
 
 									<UploadButton<OurFileRouter, "paymentProofUploader">
 										endpoint="paymentProofUploader"

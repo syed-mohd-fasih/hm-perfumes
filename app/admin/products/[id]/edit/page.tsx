@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { getProductById, updateProduct } from "@/lib/firestore";
 import { RootState } from "@/store/store";
 import { useSelector } from "react-redux";
+import { toast } from "sonner";
 
 export default function EditProductPage() {
 	const { user, isAdmin } = useSelector((state: RootState) => state.auth);
@@ -35,9 +36,11 @@ export default function EditProductPage() {
 					ingredients: data.ingredients,
 				});
 
+				toast.success("Product details updated successfully!");
 				router.push("/admin/products");
 			} catch (error) {
 				console.error("Error updating product:", error);
+				toast.error("Failed to update product. Please try again.");
 				alert("Failed to update product. Please try again.");
 			}
 		}

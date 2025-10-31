@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { getOrderById, updateOrderStatus } from "@/lib/firestore";
 import { OrderData } from "@/lib/firestore";
 import { AdminNav } from "@/components/admin-nav";
@@ -23,10 +22,10 @@ import {
 	Banknote,
 	CreditCard,
 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function AdminOrderDetailPage() {
 	const params = useParams();
-	const router = useRouter();
 	const [order, setOrder] = useState<any>(null);
 	const [loading, setLoading] = useState(true);
 	const [updating, setUpdating] = useState(false);
@@ -46,6 +45,7 @@ export default function AdminOrderDetailPage() {
 		await updateOrderStatus(order.id!, newStatus);
 		setOrder({ ...order, status: newStatus });
 		setUpdating(false);
+		toast.success("Order status updated sucessfully!");
 	};
 
 	if (loading)
